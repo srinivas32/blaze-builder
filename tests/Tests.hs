@@ -21,6 +21,7 @@ import Codec.Binary.UTF8.String (decode)
 import Blaze.ByteString.Builder
 import Blaze.ByteString.Builder.Char.Utf8
 import Blaze.ByteString.Builder.Html.Utf8
+import qualified Blaze.ByteString.Builder.Html.Word as Word
 
 main :: IO ()
 main = defaultMain $ return $ testGroup "Tests" tests
@@ -39,6 +40,9 @@ tests =
     , testCase     "escaping case 1"           escaping1
     , testCase     "escaping case 2"           escaping2
     , testCase     "escaping case 3"           escaping3
+#if MIN_VERSION_text(1,1,2) && MIN_VERSION_bytestring(0,10,4)
+    , testProperty "fromHtmlEscapedText"       wordUtf8
+#endif
     ]
 
 monoidLeftIdentity :: Builder -> Bool
@@ -81,6 +85,12 @@ escaping2 = fromString "f &amp;&amp;&amp; g" @?= fromHtmlEscapedString "f &&& g"
 
 escaping3 :: Assertion
 escaping3 = fromString "&quot;&#39;" @?= fromHtmlEscapedString "\"'"
+
+#if MIN_VERSION_text(1,1,2) && MIN_VERSION_bytestring(0,10,4)
+wordUtf8 :: String -> Property 
+wordUtf8 s = fromHtmlEscapedText t === Word.fromHtmlEscapedText t
+  where t = T.pack s
+#endif
 
 instance Show Builder where
     show = show . toLazyByteString

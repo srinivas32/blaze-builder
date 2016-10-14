@@ -25,8 +25,10 @@ import qualified Data.Text.Lazy          as TL
 import qualified Data.Text.Lazy.Encoding as TL
 
 import qualified Blaze.ByteString.Builder           as Blaze
-import qualified Blaze.ByteString.Builder.Internal  as Blaze
-import qualified Blaze.ByteString.Builder.Html.Utf8 as Blaze
+import qualified Data.ByteString.Builder.Internal   as Blaze
+import qualified Blaze.ByteString.Builder.Char.Utf8 as Blaze
+import qualified Blaze.ByteString.Builder.Html.Utf8 as BlazeUtf8
+import qualified Blaze.ByteString.Builder.Html.Word as BlazeWord
 
 main :: IO ()
 main = defaultMain 
@@ -58,13 +60,19 @@ main = defaultMain
         (L.length . TL.encodeUtf8) benchLazyText
 
     , bench "fromHtmlEscapedString :: String --[Html esc. & Utf8 encoding]--> L.ByteString" $ whnf
-        (L.length . Blaze.toLazyByteString . Blaze.fromHtmlEscapedString) benchString
+        (L.length . Blaze.toLazyByteString . BlazeUtf8.fromHtmlEscapedString) benchString
 
     , bench "fromHtmlEscapedStrictTextUnpacked :: StrictText --[HTML esc. & Utf8 encoding]--> L.ByteString" $ whnf
-        (L.length . Blaze.toLazyByteString . Blaze.fromHtmlEscapedText) benchStrictText
+        (L.length . Blaze.toLazyByteString . BlazeUtf8.fromHtmlEscapedText) benchStrictText
+     
+    , bench "fromHtmlEscapedStrictTextUnpacked :: StrictText --[Utf8 encoding --> HTML esc.]--> L.ByteString" $ whnf
+        (L.length . Blaze.toLazyByteString . BlazeWord.fromHtmlEscapedText) benchStrictText
      
     , bench "fromHtmlEscapedLazyTextUnpacked :: LazyText --[HTML esc. & Utf8 encoding]--> L.ByteString" $ whnf
-        (L.length . Blaze.toLazyByteString . Blaze.fromHtmlEscapedLazyText) benchLazyText
+        (L.length . Blaze.toLazyByteString . BlazeUtf8.fromHtmlEscapedLazyText) benchLazyText
+     
+    , bench "fromHtmlEscapedLazyTextUnpacked :: LazyText --[Utf8 encoding --> HTML esc.]--> L.ByteString" $ whnf
+        (L.length . Blaze.toLazyByteString . BlazeWord.fromHtmlEscapedLazyText) benchLazyText
      
     ]
 
