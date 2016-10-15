@@ -18,20 +18,14 @@
 ------------------------------------------------------------------------------
 
 module Blaze.ByteString.Builder.Html.Word
-  ( 
+  ( wordHtmlEscaped
     -- * Writing HTML escaped bytes to a buffer
-    writeHtmlEscapedWord
+  , writeHtmlEscapedWord
     -- * Creating Builders from HTML escaped bytes
   , fromHtmlEscapedWord
   , fromHtmlEscapedWordList
   , fromHtmlEscapedByteString
   , fromHtmlEscapedLazyByteString
-#if MIN_VERSION_text(1,1,2) && MIN_VERSION_bytestring(0,10,4)
-    -- * Creating Builders from HTML escaped and UTF-8 encoded text
-    -- | /Note/ that these functions are only available if built against @text >= 1.1.2.0@ and @bytestring >= 0.10.4.0@.
-  , fromHtmlEscapedText
-  , fromHtmlEscapedLazyText
-#endif
   ) where
 
 import qualified Blaze.ByteString.Builder.Compat.Write as W
@@ -41,10 +35,6 @@ import qualified Data.ByteString.Builder.Prim as P
 import           Data.ByteString.Internal (c2w)
 import qualified Data.ByteString.Lazy as BSL
 import           Data.Word (Word8)
-import qualified Data.Text as T
-import qualified Data.Text.Encoding as TE
-import qualified Data.Text.Lazy as TL
-import qualified Data.Text.Lazy.Encoding as TLE
 
 {-# INLINE wordHtmlEscaped #-}
 wordHtmlEscaped :: P.BoundedPrim Word8
@@ -87,15 +77,3 @@ fromHtmlEscapedByteString = P.primMapByteStringBounded wordHtmlEscaped
 -- | /O(n)/. Serialize a HTML escaped lazy 'BSL.ByteString'.
 fromHtmlEscapedLazyByteString :: BSL.ByteString -> B.Builder
 fromHtmlEscapedLazyByteString = P.primMapLazyByteStringBounded wordHtmlEscaped
-
-#if MIN_VERSION_text(1,1,2) && MIN_VERSION_bytestring(0,10,4)
--- | /O(n)/. Serialize a HTML escaped strict 'T.Text' using the UTF-8 encoding.
--- This is identical to 'Blaze.ByteString.Builder.Html.Utf8.fromHtmlEscapedText' but more than twice as fast.
-fromHtmlEscapedText :: T.Text -> B.Builder
-fromHtmlEscapedText = TE.encodeUtf8BuilderEscaped wordHtmlEscaped
-
--- | /O(n)/. Serialize a HTML escaped lazy 'TL.Text' using the UTF-8 encoding.
--- This is identical to 'Blaze.ByteString.Builder.Html.Utf8.fromHtmlEscapedLazyText' but more than three times as fast.
-fromHtmlEscapedLazyText :: TL.Text -> B.Builder
-fromHtmlEscapedLazyText = TLE.encodeUtf8BuilderEscaped wordHtmlEscaped
-#endif
