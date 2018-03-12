@@ -39,7 +39,9 @@ module Blaze.ByteString.Builder.Html.Utf8
 import Data.ByteString.Char8 ()  -- for the 'IsString' instance of bytesrings
 
 import qualified Data.Text      as TS
+import qualified Data.Text.Encoding as TE
 import qualified Data.Text.Lazy as TL
+import qualified Data.Text.Lazy.Encoding as TLE
 
 import Blaze.ByteString.Builder.Compat.Write ( Write, writePrimBounded )
 import qualified Data.ByteString.Builder       as B
@@ -47,6 +49,7 @@ import           Data.ByteString.Builder.Prim ((>*<), (>$<), condB)
 import qualified Data.ByteString.Builder.Prim  as P
 
 import Blaze.ByteString.Builder.Char.Utf8
+import Blaze.ByteString.Builder.Html.Word
 
 -- | Write a HTML escaped and UTF-8 encoded Unicode character to a bufffer.
 --
@@ -101,9 +104,17 @@ fromHtmlEscapedShow = fromHtmlEscapedString . show
 -- UTF-8 encoding.
 --
 fromHtmlEscapedText :: TS.Text -> B.Builder
+#if MIN_VERSION_text(1,1,2) && MIN_VERSION_bytestring(0,10,4)
+fromHtmlEscapedText = TE.encodeUtf8BuilderEscaped wordHtmlEscaped
+#else
 fromHtmlEscapedText = fromHtmlEscapedString . TS.unpack
+#endif
 
 -- | /O(n)/. Serialize a HTML escaped Unicode 'TL.Text' using the UTF-8 encoding.
 --
 fromHtmlEscapedLazyText :: TL.Text -> B.Builder
+#if MIN_VERSION_text(1,1,2) && MIN_VERSION_bytestring(0,10,4)
+fromHtmlEscapedLazyText = TLE.encodeUtf8BuilderEscaped wordHtmlEscaped
+#else
 fromHtmlEscapedLazyText = fromHtmlEscapedString . TL.unpack
+#endif

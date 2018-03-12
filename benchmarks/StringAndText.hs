@@ -25,7 +25,8 @@ import qualified Data.Text.Lazy          as TL
 import qualified Data.Text.Lazy.Encoding as TL
 
 import qualified Blaze.ByteString.Builder           as Blaze
-import qualified Blaze.ByteString.Builder.Internal  as Blaze
+import qualified Data.ByteString.Builder.Internal   as Blaze
+import qualified Blaze.ByteString.Builder.Char.Utf8 as Blaze
 import qualified Blaze.ByteString.Builder.Html.Utf8 as Blaze
 
 main :: IO ()
