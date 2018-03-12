@@ -53,7 +53,9 @@ import Control.Monad
 
 import Data.ByteString.Builder.Internal
 
-#if !MIN_VERSION_base(4,8,0)
+#if MIN_VERSION_base(4,9,0)
+import Data.Semigroup
+#elif !MIN_VERSION_base(4,8,0)
 import Data.Monoid
 #endif
 #if !(MIN_VERSION_base(4,11,0))
